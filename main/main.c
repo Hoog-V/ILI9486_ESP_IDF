@@ -8,7 +8,7 @@
 #include "driver/gpio.h"
 #include "lcd_ili9486_lib.h"
 
-
+static uint16_t brightnessval[2] = {0x00FF,0x0000};
 void app_main(void)
 {
  //vTaskDelay(1000/ portTICK_RATE_MS);
@@ -55,7 +55,8 @@ void app_main(void)
         emptyline[i] = color565(0, 255, 255 );
     }
     send_lines(spi, 0, emptyline, 480);
-    send_line_finish(spi);
+    send_line_finish(spi);   
+  
     while(1){
      vTaskDelay(100/ portTICK_RATE_MS);
     }
