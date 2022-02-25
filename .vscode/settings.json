@@ -1,0 +1,12 @@
+{
+    "idf.adapterTargetName": "esp32",
+    "files.associations": {
+        "freertos.h": "c",
+        "stdlib.h": "c",
+        "task.h": "c",
+        "lcd_ili9486_lib.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "Disabled",
+    "idf.port": "/dev/ttyUSB0",
+    "idf.flashType": "UART"
+}
