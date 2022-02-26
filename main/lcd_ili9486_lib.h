@@ -57,3 +57,4 @@ void  lcd_cmd16(spi_device_handle_t spi, const uint8_t cmd);
 void lcd_spi_pre_transfer_callback(spi_transaction_t *t);
 uint32_t lcd_get_id(spi_device_handle_t spi);
 void lcd_init(spi_device_handle_t spi);
+bool setCursor(spi_device_handle_t spi, uint16_t x, uint16_t y);

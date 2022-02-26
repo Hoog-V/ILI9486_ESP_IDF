@@ -8,7 +8,6 @@
 #include "driver/gpio.h"
 #include "lcd_ili9486_lib.h"
 
-static uint16_t brightnessval[2] = {0x00FF,0x0000};
 void app_main(void)
 {
  //vTaskDelay(1000/ portTICK_RATE_MS);
@@ -39,23 +38,22 @@ void app_main(void)
     //Attach the LCD to the SPI bus
     ret=spi_bus_add_device(LCD_HOST, &devcfg, &spi);
     ESP_ERROR_CHECK(ret);
-    //Initialize the LCD
     lcd_init(spi);
-   // _lcd_cmd(spi, 0x36);
-   // static uint8_t data = 0x40 | 0x08;
-   // _lcd_data(spi, &data, 1); 
-    //Initialize the effect displayed
-    //ret=pretty_effect_init();
-    //ESP_ERROR_CHECK(ret);
-    //Go do nice stuff.
-    static uint16_t emptyline[320];
+    static uint16_t repeatedLine[320];
     lcd_cmd16(spi, 0x29);
     vTaskDelay(1000/ portTICK_RATE_MS);
     for(int i = 0; i< 320; i++){
-        emptyline[i] = color565(0, 255, 255 );
+        repeatedLine[i] = 0x0000;
     }
-    send_lines(spi, 0, emptyline, 480);
-    send_line_finish(spi);   
+    send_lines(spi, 0, repeatedLine, 480);
+    send_line_finish(spi);  
+    vTaskDelay(2000/ portTICK_RATE_MS);
+    static uint16_t pixels[10];
+    for(int i = 0; i < 10; i++){
+        pixels[i]=color565(255,255,255);
+    } 
+    setCursor(spi, 200, 320);
+    lcd_data(spi,pixels,20);
   
     while(1){
      vTaskDelay(100/ portTICK_RATE_MS);

@@ -265,5 +265,21 @@ void send_line_finish(spi_device_handle_t spi)
     }
 }
 
+bool setCursor(spi_device_handle_t spi, uint16_t x, uint16_t y) {
 
-
+    if (x >= 320|| y >= 480) {
+        return false;
+    }
+    static uint16_t databuff[4];
+    lcd_cmd(spi, 0x2A);
+    databuff[0] = x >> 8;
+    databuff[1] = x & 0xFF;
+    lcd_data(spi, databuff, 4);
+    lcd_cmd(spi, CMD_RAMWR); //Column Start
+    lcd_cmd(spi, 0x2B);
+    databuff[2] = (y >> 8);
+    databuff[3] = (y & 0xFF);
+    lcd_data(spi, (databuff +2), 4);
+    lcd_cmd(spi, CMD_RAMWR); //Row Start
+    return true;
+}
