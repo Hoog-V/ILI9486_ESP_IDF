@@ -25,7 +25,7 @@ void app_main(void)
 #ifdef CONFIG_LCD_OVERCLOCK
         .clock_speed_hz=26*1000*1000,           //Clock out at 26 MHz
 #else
-        .clock_speed_hz=10*1000*1000,           //Clock out at 10 MHz
+        .clock_speed_hz=1*1000*1000,           //Clock out at 10 MHz
 #endif
         .mode=0,                                //SPI mode 0
         .spics_io_num=PIN_NUM_CS,               //CS pin
@@ -40,7 +40,6 @@ void app_main(void)
     ESP_ERROR_CHECK(ret);
     lcd_init(spi);
     static uint16_t repeatedLine[320];
-    lcd_cmd16(spi, 0x29);
     vTaskDelay(1000/ portTICK_RATE_MS);
     for(int i = 0; i< 320; i++){
         repeatedLine[i] = 0x0000;
@@ -52,8 +51,10 @@ void app_main(void)
     for(int i = 0; i < 10; i++){
         pixels[i]=color565(255,255,255);
     } 
-    setCursor(spi, 200, 320);
-    lcd_data(spi,pixels,20);
+    for(int i = 0; i< 10; i++){
+    setCursor(spi, 5+i, 320);
+    lcd_data(spi,pixels,2);
+    }
   
     while(1){
      vTaskDelay(100/ portTICK_RATE_MS);

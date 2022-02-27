@@ -42,6 +42,7 @@
 #define MADCTL_MH   0x04 
 #define CMD_WDBVAL  0x51
 #define CMD_CDBVAL  0x53
+#define CMD_DISON 0x29
 
 typedef struct {
     uint8_t cmd;

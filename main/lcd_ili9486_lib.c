@@ -9,33 +9,26 @@
 #include "lcd_ili9486_lib.h"
 
 DRAM_ATTR static const lcd_init_cmd_t ili_init_cmds[]={
-    /* Power Control 1 */
-    {CMD_PWCTRL1, {0x1900, 0x1A00}, 4},
-    /* Power Control 2 */
-    {CMD_PWCTRL2, {0x4500, 0x0000}, 4},
+    /* Display Sleepout */
+    {CMD_SLPOUT, {0}, 0x80},
     /* Power Control 3 */
-    {CMD_PWCTRL3, {0x3300},2},
+    {CMD_PWCTRL3, {0x4400},2},
     /* VCOM Control */
-    {CMD_VMCTRL, {0x0000, 0x2800},4},
-    /* Frame Rate Control */
-    {CMD_FRMCTR1, {0xA000, 0x1100},4},
-    /* Display Inversion Control 2-dot inversion */
-    {CMD_INVTR, {0x0200}, 2},
-    /* Display Function Control */
-    {CMD_DISCTRL, {0x0000, 0x4200, 0x3B00},6},
+    {CMD_VMCTRL, {0x0000, 0x0000, 0x0000, 0x0000},8},
     /* Positive gamma correction */
     {CMD_PGAMCTRL, {0x1F00, 0x2500, 0x2200, 0x0B00, 0x0600, 0x0A00, 0x4E00, 0xC600, 0x3900, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000}, 30},
     /* Negative gamma correction */
     {CMD_NGAMCTRL, {0x1F00, 0x3F00, 0x3F00, 0x0F00, 0x1F00, 0x0F00, 0x4600, 0x4900, 0x3100, 0x0500, 0x0900, 0x0300, 0x1C00, 0x1A00, 0x0000}, 30},
     /* Interface Pixel Format */
     {CMD_COLMOD, {0x5500}, 2},
-    /* Pixel format, 16bits/pixel for RGB/MCU interface */
-    {CMD_DISCTRL, {0x0000, 0x2200},4},
     /* Memory Access Control */
-    {CMD_MADCTL, {0x0800}, 2},
+    {CMD_MADCTL, {0x4800}, 2},
+    /* Turn off display inversion*/
+    {CMD_INVOFF, {0}, 0x80},
     /* Display Sleepout */
     {CMD_SLPOUT, {0}, 0x80},
-    /* Done :) */
+    {CMD_DISON, {0},0x80},
+    /* END of cmdlist :) */
     {0, {0}, 0xff}
 };
 
@@ -111,7 +104,7 @@ void lcd_spi_pre_transfer_callback(spi_transaction_t *t)
 uint32_t lcd_get_id(spi_device_handle_t spi)
 {
     //get_id cmd
-    lcd_cmd(spi, 0x04);
+    lcd_cmd16(spi, 0x04);
 
     spi_transaction_t t;
     memset(&t, 0, sizeof(t));
@@ -270,16 +263,45 @@ bool setCursor(spi_device_handle_t spi, uint16_t x, uint16_t y) {
     if (x >= 320|| y >= 480) {
         return false;
     }
-    static uint16_t databuff[4];
-    lcd_cmd(spi, 0x2A);
-    databuff[0] = x >> 8;
-    databuff[1] = x & 0xFF;
-    lcd_data(spi, databuff, 4);
-    lcd_cmd(spi, CMD_RAMWR); //Column Start
-    lcd_cmd(spi, 0x2B);
-    databuff[2] = (y >> 8);
-    databuff[3] = (y & 0xFF);
-    lcd_data(spi, (databuff +2), 4);
-    lcd_cmd(spi, CMD_RAMWR); //Row Start
+    esp_err_t ret;
+    static spi_transaction_t trans[5];
+    for (int i=0; i<5; i++) {
+      memset(&trans[i], 0, sizeof(spi_transaction_t));
+      trans[i].flags = SPI_TRANS_USE_TXDATA;
+      if((i+1) % 2){
+          trans[i].user = (void*)0;
+      }
+      else{
+          trans[i].user = (void*)1;
+      }
+    }
+    trans[0].tx_data[0]=0x00;
+    trans[0].tx_data[1]=CMD_CASET;
+    trans[0].length = 16;
+    trans[1].tx_data[0]=0x00;
+    trans[1].tx_data[1]=(x>>8);
+    trans[1].tx_data[2]= 0x00;
+    trans[1].tx_data[3]=(x&0xFF);
+    trans[1].length = 32;
+    trans[2].tx_data[0]= 0x00;
+    trans[2].tx_data[1]= CMD_PASET;
+    trans[2].length = 16;
+    trans[3].tx_data[0] = 0x00;
+    trans[3].tx_data[1] = (y>>8);
+    trans[3].tx_data[2] = 0x00;
+    trans[3].tx_data[3] = (y&0xFF);
+    trans[3].length = 32;
+    trans[4].tx_data[0] = 0x00;
+    trans[4].tx_data[1] = CMD_RAMWR;
+    trans[4].length = 16;
+
+    ret=spi_device_queue_trans(spi, &trans[0], portMAX_DELAY);
+    ret |=spi_device_queue_trans(spi, &trans[1], portMAX_DELAY);
+    ret |=spi_device_queue_trans(spi, &trans[1], portMAX_DELAY);
+    ret |=spi_device_queue_trans(spi, &trans[2], portMAX_DELAY);
+    ret |=spi_device_queue_trans(spi, &trans[3], portMAX_DELAY);
+    ret |=spi_device_queue_trans(spi, &trans[3], portMAX_DELAY);
+    ret |=spi_device_queue_trans(spi, &trans[4], portMAX_DELAY);
+    assert(ret==ESP_OK);
     return true;
 }
