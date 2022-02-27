@@ -7,7 +7,7 @@
 #include "driver/spi_master.h"
 #include "driver/gpio.h"
 #include "lcd_ili9486_lib.h"
-
+uint16_t* linebuffer = NULL;
 DRAM_ATTR static const lcd_init_cmd_t ili_init_cmds[]={
     /* Display Sleepout */
     {CMD_SLPOUT, {0}, 0x80},
@@ -161,100 +161,86 @@ void lcd_init(spi_device_handle_t spi)
     gpio_set_level(PIN_NUM_BCKL, 0);
 }
 
-
-/* To send a set of lines we have to send a command, 2 data bytes, another command, 2 more data bytes and another command
- * before sending the line data itself; a total of 6 transactions. (We can't put all of this in just one transaction
- * because the D/C line needs to be toggled in the middle.)
- * This routine queues these commands up as interrupt transactions so they get
- * sent faster (compared to calling spi_device_transmit several times), and at
- * the mean while the lines for next transactions can get calculated.
- */
-void send_lines(spi_device_handle_t spi, uint16_t ypos, uint16_t *linedata, uint16_t numlines)
-{
+void setWriteArea(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin, uint16_t width, uint16_t height){
     esp_err_t ret;
     int x;
     //Transaction descriptors. Declared static so they're not allocated on the stack; we need this memory even when this
     //function is finished because the SPI driver needs access to it even while we're already calculating the next line.
-    static spi_transaction_t trans[8];
+    static spi_transaction_t trans[7];
 
     // // //In theory, it's better to initialize trans and data only once and hang on to the initialized
     // // //variables. We allocate them on the stack, so we need to re-init them each call.
-     for (x=0; x<8; x++) {
+     for (x=0; x<7; x++) {
          memset(&trans[x], 0, sizeof(spi_transaction_t));
+         trans[x].flags = SPI_TRANS_USE_TXDATA;
      }
     trans[0].tx_data[0]=0x00;
     trans[0].tx_data[1]=0x2A;
     trans[0].length = 16;
     trans[0].user =(void*)0;
-    trans[0].flags = SPI_TRANS_USE_TXDATA;
+    
     trans[1].tx_data[0]=0x00;
-    trans[1].tx_data[1]=0x00;// XSTART
+    trans[1].tx_data[1]=xbegin >> 8;// XSTART
     trans[1].tx_data[2]=0x00;
-    trans[1].tx_data[3]=0x00;
+    trans[1].tx_data[3]=xbegin & 0xFF;
     trans[1].length = 32;
     trans[1].user =(void*)1;
-    trans[1].flags = SPI_TRANS_USE_TXDATA;
+
     trans[2].tx_data[0]=0x00;
-    trans[2].tx_data[1]=0x01; //XEND
+    trans[2].tx_data[1]=(xbegin + width-1) >> 8; //XEND
     trans[2].tx_data[2]=0x00;
-    trans[2].tx_data[3]=0x3F;
+    trans[2].tx_data[3]=(xbegin + width-1) & 0xFF;
     trans[2].length = 32;
     trans[2].user =(void*)1;
-    trans[2].flags = SPI_TRANS_USE_TXDATA;
+
     trans[3].tx_data[0]=0x00;
-    trans[3].tx_data[1]=0x2A;  //PASET
+    trans[3].tx_data[1]=0x2B;  //PASET
     trans[3].length = 16;
     trans[3].user =(void*)0;
-    trans[3].flags = SPI_TRANS_USE_TXDATA;
-    trans[4].tx_data[0]=0x00; //YSTART
-    trans[4].tx_data[1]=ypos >> 8;
+
+    trans[4].tx_data[0]=0x00;
+    trans[4].tx_data[1]=ybegin >> 8;// YSTART
     trans[4].tx_data[2]=0x00;
-    trans[4].tx_data[3]=ypos & 0xFF;
+    trans[4].tx_data[3]=ybegin & 0xFF;
     trans[4].length = 32;
     trans[4].user =(void*)1;
-    trans[4].flags = SPI_TRANS_USE_TXDATA;
-    trans[5].tx_data[0]=0x00;
-    trans[5].tx_data[1]=480 >> 8;  //YEND
+
+    trans[5].tx_data[0]=0x00; //YSTOP
+    trans[5].tx_data[1]=(ybegin+height-1) >> 8;
     trans[5].tx_data[2]=0x00;
-    trans[5].tx_data[3]=480 & 0xFF;
+    trans[5].tx_data[3]=(ybegin+height-1) & 0xFF;
     trans[5].length = 32;
     trans[5].user =(void*)1;
-    trans[5].flags = SPI_TRANS_USE_TXDATA;
+
     trans[6].tx_data[0]=0x00;
     trans[6].tx_data[1]=0x2C;
     trans[6].length = 16;
     trans[6].user =(void*)0;
-    trans[6].flags = SPI_TRANS_USE_TXDATA;
-    trans[7].tx_buffer=linedata;        //finally send the line data
-    trans[7].length=320*2*8;          //Data length, in bits
-    trans[7].flags=0; //undo SPI_TRANS_USE_TXDATA flag
-    trans[7].user =(void*)1;
-
-    //Queue all transactions.
-    for (x=0; x<8; x++) {
-        ret=spi_device_queue_trans(spi, &trans[x], portMAX_DELAY);
-        assert(ret==ESP_OK);
+    for (x=0; x<7; x++) {
+      ret=spi_device_queue_trans(spi, &trans[x], portMAX_DELAY);
+      assert(ret==ESP_OK);
     }
-    for(int i = 0; i < numlines; i++){
-        ret=spi_device_queue_trans(spi, &trans[7], portMAX_DELAY);
-        assert(ret==ESP_OK);
-    }
-    //When we are here, the SPI driver is busy (in the background) getting the transactions sent. That happens
-    //mostly using DMA, so the CPU doesn't have much to do here. We're not going to wait for the transaction to
-    //finish because we may as well spend the time calculating the next line. When that is done, we can call
-    //send_line_finish, which will wait for the transfers to be done and check their status.
 }
 
 
-void send_line_finish(spi_device_handle_t spi)
+void fillRect(spi_device_handle_t spi, uint16_t xpos, uint16_t ypos, uint16_t linedata, uint16_t linewidth, uint16_t numlines)
 {
-    spi_transaction_t *rtrans;
     esp_err_t ret;
-    //Wait for all 6 transactions to be done and get back the results.
-    for (int x=0; x<8; x++) {
-        ret=spi_device_get_trans_result(spi, &rtrans, portMAX_DELAY);
+    static spi_transaction_t trans;
+    heap_caps_free(linebuffer);
+    linebuffer= heap_caps_malloc(2*linewidth, MALLOC_CAP_DMA);
+    for(int i =0; i<linewidth; i++){
+        linebuffer[i]=linedata;
+    }
+    memset(&trans, 0, sizeof(spi_transaction_t));
+    trans.tx_buffer=linebuffer;       //finally send the line data
+    trans.length=16*linewidth;          //Data length, in bits
+    trans.user =(void*)1;
+    trans.flags=0; //undo SPI_TRANS_USE_TXDATA flag
+    setWriteArea(spi, xpos, ypos, linewidth, numlines);
+    for(int i = 0; i < numlines; i++){
+        ret=spi_device_queue_trans(spi, &trans, portMAX_DELAY);
         assert(ret==ESP_OK);
-        //We could inspect rtrans now if we received any info back. The LCD is treated as write-only, though.
     }
 }
 
