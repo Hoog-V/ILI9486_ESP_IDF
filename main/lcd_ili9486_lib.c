@@ -175,7 +175,7 @@ void setWriteArea(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin, uin
          trans[x].flags = SPI_TRANS_USE_TXDATA;
      }
     trans[0].tx_data[0]=0x00;
-    trans[0].tx_data[1]=0x2A;
+    trans[0].tx_data[1]=CMD_CASET;
     trans[0].length = 16;
     trans[0].user =(void*)0;
     
@@ -194,7 +194,7 @@ void setWriteArea(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin, uin
     trans[2].user =(void*)1;
 
     trans[3].tx_data[0]=0x00;
-    trans[3].tx_data[1]=0x2B;  //PASET
+    trans[3].tx_data[1]=CMD_PASET;  //PASET
     trans[3].length = 16;
     trans[3].user =(void*)0;
 
@@ -213,7 +213,7 @@ void setWriteArea(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin, uin
     trans[5].user =(void*)1;
 
     trans[6].tx_data[0]=0x00;
-    trans[6].tx_data[1]=0x2C;
+    trans[6].tx_data[1]=CMD_RAMWR;
     trans[6].length = 16;
     trans[6].user =(void*)0;
     for (x=0; x<7; x++) {
@@ -223,35 +223,35 @@ void setWriteArea(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin, uin
 }
 
 
-void fillRect(spi_device_handle_t spi, uint16_t xpos, uint16_t ypos, uint16_t linedata, uint16_t linewidth, uint16_t numlines)
+void fillRect(spi_device_handle_t spi, uint16_t xpos, uint16_t ypos, uint16_t width, uint16_t height, uint16_t color)
 {
     esp_err_t ret;
     static spi_transaction_t trans;
     heap_caps_free(linebuffer);
-    linebuffer= heap_caps_malloc(2*linewidth, MALLOC_CAP_DMA);
-    for(int i =0; i<linewidth; i++){
-        linebuffer[i]=linedata;
+    linebuffer= heap_caps_malloc(2*width, MALLOC_CAP_DMA);
+    setWriteArea(spi, xpos, ypos, width, height);
+    for(int i =0; i<width; i++){
+        linebuffer[i]=color;
     }
     memset(&trans, 0, sizeof(spi_transaction_t));
     trans.tx_buffer=linebuffer;       //finally send the line data
-    trans.length=16*linewidth;          //Data length, in bits
+    trans.length=16*width;          //Data length, in bits
     trans.user =(void*)1;
     trans.flags=0; //undo SPI_TRANS_USE_TXDATA flag
-    setWriteArea(spi, xpos, ypos, linewidth, numlines);
-    for(int i = 0; i < numlines; i++){
+    for(int i = 0; i < height; i++){
         ret=spi_device_queue_trans(spi, &trans, portMAX_DELAY);
         assert(ret==ESP_OK);
     }
 }
 
-bool setCursor(spi_device_handle_t spi, uint16_t x, uint16_t y) {
+bool drawPixel(spi_device_handle_t spi, uint16_t x, uint16_t y, uint16_t color) {
 
     if (x >= 320|| y >= 480) {
         return false;
     }
     esp_err_t ret;
-    static spi_transaction_t trans[5];
-    for (int i=0; i<5; i++) {
+    static spi_transaction_t trans[6];
+    for (int i=0; i<6; i++) {
       memset(&trans[i], 0, sizeof(spi_transaction_t));
       trans[i].flags = SPI_TRANS_USE_TXDATA;
       if((i+1) % 2){
@@ -280,7 +280,11 @@ bool setCursor(spi_device_handle_t spi, uint16_t x, uint16_t y) {
     trans[4].tx_data[0] = 0x00;
     trans[4].tx_data[1] = CMD_RAMWR;
     trans[4].length = 16;
-
+    trans[5].tx_data[0] = (uint16_t)(color & 0x00FF);
+    trans[5].tx_data[1] = color >> 8;
+    trans[5].length=16;
+    trans[5].flags = SPI_TRANS_USE_TXDATA;
+    trans[5].user = (void *)1;
     ret=spi_device_queue_trans(spi, &trans[0], portMAX_DELAY);
     ret |=spi_device_queue_trans(spi, &trans[1], portMAX_DELAY);
     ret |=spi_device_queue_trans(spi, &trans[1], portMAX_DELAY);
@@ -288,6 +292,45 @@ bool setCursor(spi_device_handle_t spi, uint16_t x, uint16_t y) {
     ret |=spi_device_queue_trans(spi, &trans[3], portMAX_DELAY);
     ret |=spi_device_queue_trans(spi, &trans[3], portMAX_DELAY);
     ret |=spi_device_queue_trans(spi, &trans[4], portMAX_DELAY);
+    ret |=spi_device_queue_trans(spi, &trans[5], portMAX_DELAY);
     assert(ret==ESP_OK);
     return true;
+}
+
+void drawVLine(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin, uint16_t length, uint16_t color){
+    setWriteArea(spi, xbegin, ybegin, 1, length);
+    esp_err_t ret;
+    static spi_transaction_t trans;
+    linebuffer= heap_caps_malloc(2*length, MALLOC_CAP_DMA);
+    for(int i =0; i<length; i++){
+        linebuffer[i]=color;
+    }
+    memset(&trans, 0, sizeof(spi_transaction_t));
+    trans.tx_buffer=linebuffer;       //finally send the line data
+    trans.length=16*length;          //Data length, in bits
+    trans.user =(void*)1;
+    trans.flags=0; //undo SPI_TRANS_USE_TXDATA flag
+    ret=spi_device_queue_trans(spi, &trans, portMAX_DELAY);
+    assert(ret==ESP_OK);
+}
+
+void drawHLine(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin, uint16_t length, uint16_t color){
+    setWriteArea(spi, xbegin, ybegin, length, 1);
+    esp_err_t ret;
+    static spi_transaction_t trans;
+    linebuffer= heap_caps_malloc(2*length, MALLOC_CAP_DMA);
+    for(int i =0; i<length; i++){
+        linebuffer[i]=color;
+    }
+    memset(&trans, 0, sizeof(spi_transaction_t));
+    trans.tx_buffer=linebuffer;       //finally send the line data
+    trans.length=16*length;          //Data length, in bits
+    trans.user =(void*)1;
+    trans.flags=0; //undo SPI_TRANS_USE_TXDATA flag
+    ret=spi_device_queue_trans(spi, &trans, portMAX_DELAY);
+    assert(ret==ESP_OK);
+}
+
+void drawRect(spi_device_handle_t spi, uint16_t xpos, uint16_t ypos, uint16_t linedata, uint16_t linewidth){
+
 }
