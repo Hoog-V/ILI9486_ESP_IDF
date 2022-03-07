@@ -1,13 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_system.h"
 #include "driver/spi_master.h"
 #include "driver/gpio.h"
-#include "lcd_ili9486_lib.h"
-#include <math.h>
+#include "lib/lcd_ili9486_base.h"
+#include "lib/lcd_ili9486_primitives.h"
+#include "lib/lcd_ili9486_colors.h"
+
 void app_main(void)
 {
     esp_err_t ret;
@@ -36,4 +39,5 @@ void app_main(void)
     lcd_init(spi);
     fillRect(spi, 0, 0, 320, 480, 0x0000);
     drawRect(spi, 60, 200, 200, 200, 0xFFFF);
+    drawLine(spi, 1, 1, 320, 480, 0xFFFF);
 }

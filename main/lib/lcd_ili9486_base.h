@@ -26,6 +26,9 @@
 #define CMD_NGAMCTRL 0xE1
 #define CMD_COLMOD 0x3A
 #define CMD_RAMRDRC 0x3E
+#define CMD_WDBVAL  0x51
+#define CMD_CDBVAL  0x53
+#define CMD_DISON 0x29
 
 #define CMD_INVOFF  0x20 // Display Inversion OFF
 #define CMD_INVON   0x21 // Display Inversion ON
@@ -40,25 +43,36 @@
 #define MADCTL_ML   0x10
 #define MADCTL_BGR  0x08 
 #define MADCTL_MH   0x04 
-#define CMD_WDBVAL  0x51
-#define CMD_CDBVAL  0x53
-#define CMD_DISON 0x29
+
+
+#ifndef _swap_int16_t
+#define _swap_int16_t(a, b)                                                    \
+  {                                                                            \
+    int16_t t = a;                                                             \
+    a = b;                                                                     \
+    b = t;                                                                     \
+  }
+#endif
 
 typedef struct {
     uint8_t cmd;
     uint16_t data[20];
-    uint8_t databytes; //No of data in data; bit 7 = delay after set; 0xFF = end of cmds.
+    uint8_t databytes; //No of values in data; 
+                       //bit 7 = delay after set; 0xFF = end of cmds.
 } lcd_init_cmd_t;
 
-void fillRect(spi_device_handle_t spi, uint16_t xpos, uint16_t ypos, uint16_t width, uint16_t height, uint16_t color);
-void setWriteArea(spi_device_handle_t spi, uint16_t ybegin, uint16_t xbegin, uint16_t width, uint16_t height);
-uint16_t color565(uint8_t r, uint8_t g, uint8_t b);
+
+
+void setWriteArea(spi_device_handle_t spi, uint16_t ybegin, uint16_t xbegin, 
+                                           uint16_t width, uint16_t height);
+
 void lcd_data(spi_device_handle_t spi, const uint16_t *data, int len);
+
 void  lcd_cmd16(spi_device_handle_t spi, const uint8_t cmd);
+
 void lcd_spi_pre_transfer_callback(spi_transaction_t *t);
+
 uint32_t lcd_get_id(spi_device_handle_t spi);
+
 void lcd_init(spi_device_handle_t spi);
-bool drawPixel(spi_device_handle_t spi, uint16_t x, uint16_t y, uint16_t color);
-void drawVLine(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin, uint16_t length, uint16_t color);
-void drawHLine(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin, uint16_t length, uint16_t color);
-void drawRect(spi_device_handle_t spi, uint16_t xpos, uint16_t ypos, uint16_t width, uint16_t height, uint16_t color);
+

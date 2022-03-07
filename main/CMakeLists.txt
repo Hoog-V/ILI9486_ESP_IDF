@@ -1,6 +1,8 @@
 set(srcs "main.c" 
-          "lcd_ili9486_lib.c"
+          "lib/lcd_ili9486_base.c"
+          "lib/lcd_ili9486_primitives.c"
           )
 
 idf_component_register(SRCS ${srcs}
-                    INCLUDE_DIRS ".")
+                    INCLUDE_DIRS "."
+                    INCLUDE_DIRS "lib")
