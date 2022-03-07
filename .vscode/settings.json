@@ -6,7 +6,9 @@
         "task.h": "c",
         "lcd_ili9486_lib.h": "c",
         "esp_system.h": "c",
-        "math.h": "c"
+        "math.h": "c",
+        "*.contiki": "c",
+        "*.lwip": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
     "idf.port": "/dev/ttyUSB0",

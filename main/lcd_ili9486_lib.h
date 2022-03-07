@@ -50,7 +50,7 @@ typedef struct {
     uint8_t databytes; //No of data in data; bit 7 = delay after set; 0xFF = end of cmds.
 } lcd_init_cmd_t;
 
-void fillRect(spi_device_handle_t spi, uint16_t xpos, uint16_t ypos, uint16_t linedata, uint16_t linewidth, uint16_t numlines);
+void fillRect(spi_device_handle_t spi, uint16_t xpos, uint16_t ypos, uint16_t width, uint16_t height, uint16_t color);
 void setWriteArea(spi_device_handle_t spi, uint16_t ybegin, uint16_t xbegin, uint16_t width, uint16_t height);
 uint16_t color565(uint8_t r, uint8_t g, uint8_t b);
 void lcd_data(spi_device_handle_t spi, const uint16_t *data, int len);
@@ -61,3 +61,4 @@ void lcd_init(spi_device_handle_t spi);
 bool drawPixel(spi_device_handle_t spi, uint16_t x, uint16_t y, uint16_t color);
 void drawVLine(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin, uint16_t length, uint16_t color);
 void drawHLine(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin, uint16_t length, uint16_t color);
+void drawRect(spi_device_handle_t spi, uint16_t xpos, uint16_t ypos, uint16_t width, uint16_t height, uint16_t color);

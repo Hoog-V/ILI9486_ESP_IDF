@@ -21,14 +21,10 @@ void app_main(void)
         .max_transfer_sz=LCD_Width*16
     };
     spi_device_interface_config_t devcfg={
-#ifdef CONFIG_LCD_OVERCLOCK
-        .clock_speed_hz=26*1000*1000,           //Clock out at 26 MHz
-#else
         .clock_speed_hz=32*1000*1000,           //Clock out at 10 MHz
-#endif
         .mode=0,                                //SPI mode 0
         .spics_io_num=PIN_NUM_CS,               //CS pin
-        .queue_size=60,                          //We want to be able to queue 7 transactions at a time
+        .queue_size=10,                          //We want to be able to queue enough transactions to fill an screen
         .pre_cb=lcd_spi_pre_transfer_callback,  //Specify pre-transfer callback to handle D/C line
     };
     //Initialize the SPI bus
@@ -39,26 +35,5 @@ void app_main(void)
     ESP_ERROR_CHECK(ret);
     lcd_init(spi);
     fillRect(spi, 0, 0, 320, 480, 0x0000);
-    float y;
-    float z;
-    int linethickness = 1;
-    drawVLine(spi, 20, 300, 100, 0xFFFF);
-    drawHLine(spi, 20, 400, 100, 0xFFFF);
-    int k = 0;
-    while(1){
-    fillRect(spi, 0, 10, 320, 200, 0x0000);
-    for(int p =0; p < linethickness; p++){
-    for(int i = 0; i < 500; i++){
-    y= (i+k)*0.0174363323;
-    z= (sin(y*6)*20)+(99+p);
-    drawPixel(spi, i, z, 0xFFFF);
-    }
-    }
-    vTaskDelay(1/1000);
-    k+=10;
-    //  fillRect(spi, 0, 0, 0x0000, 320, 480);  
-    //  vTaskDelay(1000/ portTICK_RATE_MS);
-    //  fillRect(spi, 0, 0, 0xFFFF, 320, 480);  
-      //printf("Amount of free size: %d \n",  heap_caps_get_free_size(MALLOC_CAP_DMA));
-    }
+    drawRect(spi, 60, 200, 200, 200, 0xFFFF);
 }

@@ -7,7 +7,6 @@
 #include "driver/spi_master.h"
 #include "driver/gpio.h"
 #include "lcd_ili9486_lib.h"
-uint16_t* linebuffer = NULL;
 DRAM_ATTR static const lcd_init_cmd_t ili_init_cmds[]={
     /* Display Sleepout */
     {CMD_SLPOUT, {0}, 0x80},
@@ -24,7 +23,7 @@ DRAM_ATTR static const lcd_init_cmd_t ili_init_cmds[]={
     /* Memory Access Control */
     {CMD_MADCTL, {0x4800}, 2},
     /* Turn off display inversion*/
-    {CMD_INVOFF, {0}, 0x80},
+    {CMD_INVOFF, {0}, 0x80},    //ets_delay_us(1);
     /* Display Sleepout */
     {CMD_SLPOUT, {0}, 0x80},
     {CMD_DISON, {0},0x80},
@@ -220,11 +219,18 @@ void setWriteArea(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin, uin
       ret=spi_device_queue_trans(spi, &trans[x], portMAX_DELAY);
       assert(ret==ESP_OK);
     }
+    spi_transaction_t *rtrans;
+    for (int x=0; x<7; x++) {
+        ret=spi_device_get_trans_result(spi, &rtrans, portMAX_DELAY);
+        assert(ret==ESP_OK);
+        //We could inspect rtrans now if we received any info back. The LCD is treated as write-only, though.
+    }
 }
 
 
 void fillRect(spi_device_handle_t spi, uint16_t xpos, uint16_t ypos, uint16_t width, uint16_t height, uint16_t color)
 {
+    uint16_t* linebuffer = NULL;
     esp_err_t ret;
     static spi_transaction_t trans;
     heap_caps_free(linebuffer);
@@ -238,10 +244,14 @@ void fillRect(spi_device_handle_t spi, uint16_t xpos, uint16_t ypos, uint16_t wi
     trans.length=16*width;          //Data length, in bits
     trans.user =(void*)1;
     trans.flags=0; //undo SPI_TRANS_USE_TXDATA flag
+    spi_transaction_t *rtrans;
     for(int i = 0; i < height; i++){
         ret=spi_device_queue_trans(spi, &trans, portMAX_DELAY);
         assert(ret==ESP_OK);
-    }
+        ret=spi_device_get_trans_result(spi, &rtrans, portMAX_DELAY);
+        assert(ret==ESP_OK);
+        }
+    heap_caps_free(linebuffer);
 }
 
 bool drawPixel(spi_device_handle_t spi, uint16_t x, uint16_t y, uint16_t color) {
@@ -298,6 +308,7 @@ bool drawPixel(spi_device_handle_t spi, uint16_t x, uint16_t y, uint16_t color) 
 }
 
 void drawVLine(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin, uint16_t length, uint16_t color){
+    uint16_t* linebuffer = NULL;
     setWriteArea(spi, xbegin, ybegin, 1, length);
     esp_err_t ret;
     static spi_transaction_t trans;
@@ -312,9 +323,15 @@ void drawVLine(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin, uint16
     trans.flags=0; //undo SPI_TRANS_USE_TXDATA flag
     ret=spi_device_queue_trans(spi, &trans, portMAX_DELAY);
     assert(ret==ESP_OK);
+    spi_transaction_t *rtrans;
+    ret=spi_device_get_trans_result(spi, &rtrans, portMAX_DELAY);
+    assert(ret==ESP_OK);
+    //We could inspect rtrans now if we received any info back. The LCD is treated as write-only, though.
+    heap_caps_free(linebuffer);
 }
 
 void drawHLine(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin, uint16_t length, uint16_t color){
+    uint16_t* linebuffer = NULL;
     setWriteArea(spi, xbegin, ybegin, length, 1);
     esp_err_t ret;
     static spi_transaction_t trans;
@@ -329,8 +346,17 @@ void drawHLine(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin, uint16
     trans.flags=0; //undo SPI_TRANS_USE_TXDATA flag
     ret=spi_device_queue_trans(spi, &trans, portMAX_DELAY);
     assert(ret==ESP_OK);
+    spi_transaction_t *rtrans;
+    ret=spi_device_get_trans_result(spi, &rtrans, portMAX_DELAY);
+    assert(ret==ESP_OK);
+    //We could inspect rtrans now if we received any info back. The LCD is treated as write-only, though.
+    
+    heap_caps_free(linebuffer);
 }
 
-void drawRect(spi_device_handle_t spi, uint16_t xpos, uint16_t ypos, uint16_t linedata, uint16_t linewidth){
-
+void drawRect(spi_device_handle_t spi, uint16_t xpos, uint16_t ypos, uint16_t width, uint16_t height, uint16_t color){
+    drawVLine(spi, xpos, ypos, height, color);
+    drawVLine(spi, (xpos+width), ypos, height, color);
+    drawHLine(spi, xpos, ypos, width, color);
+    drawHLine(spi, xpos, (ypos+height), width, color);
 }
