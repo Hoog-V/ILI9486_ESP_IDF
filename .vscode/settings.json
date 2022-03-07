@@ -11,7 +11,9 @@
         "*.contiki": "c",
         "*.lwip": "c",
         "spi_master.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "chrono": "c",
+        "complex": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
     "idf.port": "/dev/ttyUSB0",

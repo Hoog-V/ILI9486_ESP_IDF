@@ -13,7 +13,8 @@
 void writeLine(spi_device_handle_t spi, int16_t xbegin, int16_t ybegin, int16_t xend, 
          int16_t yend, uint16_t color)
 {
-    if(abs(ybegin-yend) > abs(xbegin-xend)){
+    bool steep = abs(ybegin-yend) > abs(xbegin-xend);
+    if(steep){
         _swap_int16_t(xbegin, ybegin);
         _swap_int16_t(xend, yend);
     }
@@ -35,7 +36,7 @@ void writeLine(spi_device_handle_t spi, int16_t xbegin, int16_t ybegin, int16_t 
     }
 
     for (; xbegin <= xend; xbegin++) {
-      if (abs(ybegin-yend) > abs(xbegin-xend)) {
+      if (steep) {
         drawPixel(spi, ybegin, xbegin, color);
       } else {
         drawPixel(spi, xbegin, ybegin, color);
