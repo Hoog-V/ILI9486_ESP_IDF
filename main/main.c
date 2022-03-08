@@ -4,6 +4,7 @@
 #include <math.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include <esp_task_wdt.h>
 #include "esp_system.h"
 #include "driver/spi_master.h"
 #include "driver/gpio.h"
@@ -27,7 +28,7 @@ void app_main(void)
         .clock_speed_hz=32*1000*1000,           //Clock out at 10 MHz
         .mode=0,                                //SPI mode 0
         .spics_io_num=PIN_NUM_CS,               //CS pin
-        .queue_size=10,                          //We want to be able to queue enough transactions to fill an screen
+        .queue_size=32,                          //We want to be able to queue enough transactions to fill an screen
         .pre_cb=lcd_spi_pre_transfer_callback,  //Specify pre-transfer callback to handle D/C line
     };
     //Initialize the SPI bus
@@ -39,5 +40,5 @@ void app_main(void)
     lcd_init(spi);
     fillRect(spi, 0, 0, 320, 480, 0x0000);
     drawRect(spi, 60, 200, 200, 200, 0xFFFF);
-    drawLine(spi, 1, 1, 320, 480, 0xFFFF);
+    fillTriangle(spi, 20,100,100,100,50,20,0xFFFF);
 }
