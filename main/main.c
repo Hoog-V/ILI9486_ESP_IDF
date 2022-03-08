@@ -39,6 +39,7 @@ void app_main(void)
     ESP_ERROR_CHECK(ret);
     lcd_init(spi);
     fillRect(spi, 0, 0, 320, 480, 0x0000);
-    drawRect(spi, 60, 200, 200, 200, 0xFFFF);
-    fillTriangle(spi, 20,100,100,100,50,20,0xFFFF);
+    fillRoundRect(spi, 60, 200, 200, 200, 20, 0xFFFF);
+    //fillTriangle(spi, 20,100,100,100,50,20,0xFFFF);
+    fillCircle(spi, 40, 40, 20, 0xFFFF);
 }

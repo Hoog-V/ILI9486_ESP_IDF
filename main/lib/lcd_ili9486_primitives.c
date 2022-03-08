@@ -11,89 +11,6 @@
 #include "lcd_ili9486_primitives.h"
 
 
-void writeLine(spi_device_handle_t spi, int16_t xbegin, int16_t ybegin, int16_t xend, 
-         int16_t yend, uint16_t color)
-{
-    bool steep = abs(ybegin-yend) > abs(xbegin-xend);
-    if(steep){
-        _swap_int16_t(xbegin, ybegin);
-        _swap_int16_t(xend, yend);
-    }
-        
-    if(xbegin > xend){
-        _swap_int16_t(xbegin, xend);
-        _swap_int16_t(ybegin, yend);
-    }
-        
-    int16_t dx, dy, ystep, err;
-    dx = xend - xbegin;
-    dy = abs(yend - ybegin);
-    err = dx / 2;
-
-    if (ybegin < yend) {
-     ystep = 1;
-    } else {
-     ystep = -1;
-    }
-
-    for (; xbegin <= xend; xbegin++) {
-      esp_task_wdt_reset();
-      if (steep) {
-        drawPixel(spi, ybegin, xbegin, color);
-      } else {
-        drawPixel(spi, xbegin, ybegin, color);
-      }
-      err -= dy;
-      if (err < 0) {
-        ybegin += ystep;
-        err += dx;
-      }
-    }
-}
-
-void drawLine(spi_device_handle_t spi, int16_t xbegin, int16_t ybegin, int16_t xend, 
-        int16_t yend, uint16_t color)
-{
-    if(xbegin == xend){
-        uint16_t length = abs(yend-ybegin);
-        ybegin = ybegin > yend ? yend : ybegin;
-        drawVLine(spi, xbegin, ybegin, length, color);
-    }
-    else if(ybegin == yend){
-        uint16_t length = abs(xend-xbegin);
-        xbegin = xbegin > xend ? xend : xbegin;
-        drawHLine(spi, xbegin, ybegin, length, color);
-    }
-    else{
-        writeLine(spi, xbegin, ybegin, xend, yend, color);
-    }
-}
-
-void drawVLine(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin, 
-        uint16_t length, uint16_t color)
-{
-    uint16_t* linebuffer = NULL;
-    setWriteArea(spi, xbegin, ybegin, 1, length);
-    esp_err_t ret;
-    static spi_transaction_t trans;
-    linebuffer= heap_caps_malloc(2*length, MALLOC_CAP_DMA);
-    for(int i =0; i<length; i++){
-        linebuffer[i]=color;
-    }
-    memset(&trans, 0, sizeof(spi_transaction_t));
-    trans.tx_buffer=linebuffer;       //finally send the line data
-    trans.length=16*length;          //Data length, in bits
-    trans.user =(void*)1;
-    trans.flags=0; //undo SPI_TRANS_USE_TXDATA flag
-    ret=spi_device_queue_trans(spi, &trans, portMAX_DELAY);
-    assert(ret==ESP_OK);
-    spi_transaction_t *rtrans;
-    ret=spi_device_get_trans_result(spi, &rtrans, portMAX_DELAY);
-    assert(ret==ESP_OK);
-    heap_caps_free(linebuffer);
-}
-
-
 void drawRect(spi_device_handle_t spi, uint16_t xpos, uint16_t ypos, uint16_t width, 
         uint16_t height, uint16_t color)
 {
@@ -130,86 +47,6 @@ void fillRect(spi_device_handle_t spi, uint16_t xpos, uint16_t ypos, uint16_t wi
     heap_caps_free(linebuffer);
 }
 
-bool drawPixel(spi_device_handle_t spi, uint16_t x, uint16_t y, uint16_t color) 
-{
-    if (x >= 320|| y >= 480) {
-        return false;
-    }
-    esp_err_t ret;
-    static spi_transaction_t trans[6];
-    for (int i=0; i<6; i++) {
-      memset(&trans[i], 0, sizeof(spi_transaction_t));
-      trans[i].flags = SPI_TRANS_USE_TXDATA;
-      if((i+1) % 2){
-          trans[i].user = (void*)0;
-      }
-      else{
-          trans[i].user = (void*)1;
-      }
-    }
-    trans[0].tx_data[0]=0x00;
-    trans[0].tx_data[1]=CMD_CASET;
-    trans[0].length = 16;
-    trans[1].tx_data[0]=0x00;
-    trans[1].tx_data[1]=(x>>8);
-    trans[1].tx_data[2]= 0x00;
-    trans[1].tx_data[3]=(x&0xFF);
-    trans[1].length = 32;
-    trans[2].tx_data[0]= 0x00;
-    trans[2].tx_data[1]= CMD_PASET;
-    trans[2].length = 16;
-    trans[3].tx_data[0] = 0x00;
-    trans[3].tx_data[1] = (y>>8);
-    trans[3].tx_data[2] = 0x00;
-    trans[3].tx_data[3] = (y&0xFF);
-    trans[3].length = 32;
-    trans[4].tx_data[0] = 0x00;
-    trans[4].tx_data[1] = CMD_RAMWR;
-    trans[4].length = 16;
-    trans[5].tx_data[0] = (uint16_t)(color & 0x00FF);
-    trans[5].tx_data[1] = color >> 8;
-    trans[5].length=16;
-    trans[5].flags = SPI_TRANS_USE_TXDATA;
-    trans[5].user = (void *)1;
-    ret=spi_device_queue_trans(spi, &trans[0], portMAX_DELAY);
-    ret |=spi_device_queue_trans(spi, &trans[1], portMAX_DELAY);
-    ret |=spi_device_queue_trans(spi, &trans[1], portMAX_DELAY);
-    ret |=spi_device_queue_trans(spi, &trans[2], portMAX_DELAY);
-    ret |=spi_device_queue_trans(spi, &trans[3], portMAX_DELAY);
-    ret |=spi_device_queue_trans(spi, &trans[3], portMAX_DELAY);
-    ret |=spi_device_queue_trans(spi, &trans[4], portMAX_DELAY);
-    ret |=spi_device_queue_trans(spi, &trans[5], portMAX_DELAY);
-    assert(ret==ESP_OK);
-    return true;
-}
-
-
-
-void drawHLine(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin,
-        uint16_t length, uint16_t color){
-            
-    uint16_t* linebuffer = NULL;
-    setWriteArea(spi, xbegin, ybegin, length, 1);
-    esp_err_t ret;
-    static spi_transaction_t trans;
-    linebuffer= heap_caps_malloc(2*length, MALLOC_CAP_DMA);
-    for(int i =0; i<length; i++){
-        linebuffer[i]=color;
-    }
-    memset(&trans, 0, sizeof(spi_transaction_t));
-    trans.tx_buffer=linebuffer;       //finally send the line data
-    trans.length=16*length;          //Data length, in bits
-    trans.user =(void*)1;
-    trans.flags=0; //undo SPI_TRANS_USE_TXDATA flag
-    ret=spi_device_queue_trans(spi, &trans, portMAX_DELAY);
-    assert(ret==ESP_OK);
-    spi_transaction_t *rtrans;
-
-    ret=spi_device_get_trans_result(spi, &rtrans, portMAX_DELAY);
-    assert(ret==ESP_OK);
-    
-    heap_caps_free(linebuffer);
-}
 
 void drawTriangle(spi_device_handle_t spi, uint16_t x0, uint16_t y0, uint16_t x1, 
          uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color)
@@ -299,4 +136,162 @@ void fillTriangle(spi_device_handle_t spi, uint16_t x0, uint16_t y0, uint16_t x1
       _swap_int16_t(a, b);
     drawHLine(spi, a, y, b - a + 1, color);
   }
+}
+
+void drawCircle(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin, 
+        uint16_t radius, uint16_t color)
+{
+  int16_t f = 1 - radius;
+  int16_t ddF_x = 1;
+  int16_t ddF_y = -2 * radius;
+  int16_t x = 0;
+  int16_t y = radius;
+
+  drawPixel(spi, xbegin, ybegin + radius, color);
+  drawPixel(spi, xbegin, ybegin - radius, color);
+  drawPixel(spi, xbegin + radius, ybegin, color);
+  drawPixel(spi, xbegin - radius, ybegin, color);
+
+  while (x < y) {
+    if (f >= 0) {
+      y--;
+      ddF_y += 2;
+      f += ddF_y;
+    }
+    x++;
+    ddF_x += 2;
+    f += ddF_x;
+
+    drawPixel(spi, xbegin + x, ybegin + y, color);
+    drawPixel(spi, xbegin - x, ybegin + y, color);
+    drawPixel(spi, xbegin + x, ybegin - y, color);
+    drawPixel(spi, xbegin - x, ybegin - y, color);
+    drawPixel(spi, xbegin + y, ybegin + x, color);
+    drawPixel(spi, xbegin - y, ybegin + x, color);
+    drawPixel(spi, xbegin + y, ybegin - x, color);
+    drawPixel(spi, xbegin - y, ybegin - x, color);
+}
+}
+
+void fillCircleHelper(spi_device_handle_t spi, int16_t x0, int16_t y0, int16_t r, 
+        uint8_t corners, int16_t delta, uint16_t color) 
+{
+
+  int16_t f = 1 - r;
+  int16_t ddF_x = 1;
+  int16_t ddF_y = -2 * r;
+  int16_t x = 0;
+  int16_t y = r;
+  int16_t px = x;
+  int16_t py = y;
+
+  delta++; // Avoid some +1's in the loop
+
+  while (x < y) {
+    if (f >= 0) {
+      y--;
+      ddF_y += 2;
+      f += ddF_y;
+    }
+    x++;
+    ddF_x += 2;
+    f += ddF_x;
+    // These checks avoid double-drawing certain lines, important
+    // for the SSD1306 library which has an INVERT drawing mode.
+    if (x < (y + 1)) {
+      if (corners & 1)
+        drawVLine(spi, x0 + x, y0 - y, 2 * y + delta, color);
+      if (corners & 2)
+        drawVLine(spi, x0 - x, y0 - y, 2 * y + delta, color);
+    }
+    if (y != py) {
+      if (corners & 1)
+        drawVLine(spi, x0 + py, y0 - px, 2 * px + delta, color);
+      if (corners & 2)
+        drawVLine(spi, x0 - py, y0 - px, 2 * px + delta, color);
+      py = y;
+    }
+    px = x;
+  }
+}
+
+void fillCircle(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin, 
+        uint16_t radius, uint16_t color)
+{
+    drawVLine(spi, xbegin, ybegin - radius, 2 * radius + 1, color);
+    fillCircleHelper(spi, xbegin, ybegin, radius, 3, 0, color);
+}
+
+
+void drawCircleHelper(spi_device_handle_t spi, int16_t x0, int16_t y0, int16_t r,
+         uint8_t cornername, uint16_t color) 
+{
+  int16_t f = 1 - r;
+  int16_t ddF_x = 1;
+  int16_t ddF_y = -2 * r;
+  int16_t x = 0;
+  int16_t y = r;
+
+  while (x < y) {
+    if (f >= 0) {
+      y--;
+      ddF_y += 2;
+      f += ddF_y;
+    }
+    x++;
+    ddF_x += 2;
+    f += ddF_x;
+    if (cornername & 0x4) {
+      drawPixel(spi, x0 + x, y0 + y, color);
+      drawPixel(spi, x0 + y, y0 + x, color);
+    }
+    if (cornername & 0x2) {
+      drawPixel(spi, x0 + x, y0 - y, color);
+      drawPixel(spi, x0 + y, y0 - x, color);
+    }
+    if (cornername & 0x8) {
+      drawPixel(spi, x0 - y, y0 + x, color);
+      drawPixel(spi, x0 - x, y0 + y, color);
+    }
+    if (cornername & 0x1) {
+      drawPixel(spi, x0 - y, y0 - x, color);
+      drawPixel(spi, x0 - x, y0 - y, color);
+    }
+  }
+}
+
+
+
+void drawRoundRect(spi_device_handle_t spi, uint16_t xpos, uint16_t ypos, uint16_t width, 
+        uint16_t height, uint16_t radius, uint16_t color)
+{
+  int16_t max_radius = ((width < height) ? width : height) / 2; // 1/2 minor axis
+  if (radius > max_radius)
+    radius = max_radius;
+  // smarter version
+  drawHLine(spi, xpos + radius, ypos, width - 2 * radius, color);         // Top
+  drawHLine(spi, xpos + radius, ypos + height - 1, width - 2 * radius, color); // Bottom
+  drawVLine(spi, xpos, ypos + radius, height - 2 * radius, color);         // Left
+  drawVLine(spi, xpos + width - 1, ypos + radius, height - 2 * radius, color); // Right
+  // draw four corners
+  drawCircleHelper(spi, xpos + radius, ypos + radius, radius, 1, color);
+  drawCircleHelper(spi, xpos + width - radius - 1, ypos + radius, radius, 2, color);
+  drawCircleHelper(spi, xpos + width - radius - 1, ypos + height - radius - 1, radius, 
+                   4, color);
+  drawCircleHelper(spi, xpos + radius, ypos + height - radius - 1, radius, 8, color);
+}
+
+void fillRoundRect(spi_device_handle_t spi, uint16_t xpos, uint16_t ypos, uint16_t width, 
+        uint16_t height, uint16_t radius, uint16_t color)
+{  
+    int16_t max_radius = ((width < height) ? width : height) / 2; // 1/2 minor axis
+    if (radius > max_radius)
+        radius = max_radius;
+    // smarter version
+    fillRect(spi, xpos + radius, ypos, width - 2 * radius, height, color);
+    // draw four corners
+    fillCircleHelper(spi, xpos + width - radius - 1, ypos + radius, radius, 1, 
+        height - 2 * radius - 1, color);
+    fillCircleHelper(spi, xpos + radius, ypos + radius, radius, 2, 
+        height - 2 * radius - 1, color);
 }
