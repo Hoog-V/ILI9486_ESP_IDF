@@ -11,9 +11,18 @@
 #include "lib/lcd_ili9486_base.h"
 #include "lib/lcd_ili9486_primitives.h"
 #include "lib/lcd_ili9486_colors.h"
+#include "lib/lcd_ili9486_fontparser.h"
+#include "lib/lcdfont.h"
+//#include "font8x8_basic.h"
+//#include "Arial_32.h"
+//#include "Arial_64.h"
+//#include "Arial_8.h"
+#include "Fonts/Arial_24.h"
 
-void app_main(void)
-{
+
+
+
+spi_device_handle_t setup_spi(){
     esp_err_t ret;
     spi_device_handle_t spi;
     spi_bus_config_t buscfg={
@@ -24,22 +33,37 @@ void app_main(void)
         .quadhd_io_num=-1,
         .max_transfer_sz=LCD_Width*16
     };
-    spi_device_interface_config_t devcfg={
-        .clock_speed_hz=32*1000*1000,           //Clock out at 10 MHz
-        .mode=0,                                //SPI mode 0
-        .spics_io_num=PIN_NUM_CS,               //CS pin
-        .queue_size=32,                          //We want to be able to queue enough transactions to fill an screen
-        .pre_cb=lcd_spi_pre_transfer_callback,  //Specify pre-transfer callback to handle D/C line
-    };
     //Initialize the SPI bus
     ret=spi_bus_initialize(LCD_HOST, &buscfg, SPI_DMA_CH_AUTO);
     ESP_ERROR_CHECK(ret);
     //Attach the LCD to the SPI bus
-    ret=spi_bus_add_device(LCD_HOST, &devcfg, &spi);
+    ret=spi_bus_add_device(LCD_HOST, &ILI9486_devcfg, &spi);
     ESP_ERROR_CHECK(ret);
+    return spi;
+}
+
+void app_main(void)
+{
+    struct lcdfont Arial_24;
+    Arial_24.char_addr = Arial24_char_addr;
+    Arial_24.width = Arial24_char_width;
+    Arial_24.font_size = 24;
+    Arial_24.line_size= 8;
+    spi_device_handle_t spi = setup_spi();
     lcd_init(spi);
     fillRect(spi, 0, 0, 320, 480, 0x0000);
-    fillRoundRect(spi, 60, 200, 200, 200, 20, 0xFFFF);
+    //fillRoundRect(spi, 60, 200, 200, 200, 20, 0xFFFF);
     //fillTriangle(spi, 20,100,100,100,50,20,0xFFFF);
-    fillCircle(spi, 40, 40, 20, 0xFFFF);
+    //fillCircle(spi, 40, 40, 20, 0xFFFF);
+    for(int i =0; i< 10; i++){
+        //
+        //vTaskDelay(10);
+        drawChar(spi, 22, 100,i+48, Arial_24);
+        vTaskDelay(1000/portTICK_PERIOD_MS);
+        fillRect(spi, 22, 100, 24, 24, 0x0000);
+    }
+    //render(spi, 22, 100, font8x8_basic['H']);
+    //render(spi, 30, 100, font8x8_basic['o']);
+    //render(spi, 38, 100, font8x8_basic['i']);
+    //render(spi, 38, 100, bitmap_48);
 }

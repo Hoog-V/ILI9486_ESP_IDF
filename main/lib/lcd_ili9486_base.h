@@ -44,6 +44,7 @@
 #define MADCTL_BGR  0x08 
 #define MADCTL_MH   0x04 
 
+extern spi_device_interface_config_t ILI9486_devcfg;
 
 #ifndef _swap_int16_t
 #define _swap_int16_t(a, b)                                                    \
@@ -62,6 +63,7 @@ typedef struct {
 } lcd_init_cmd_t;
 
 
+void lcd_spi_pre_transfer_callback(spi_transaction_t *t);
 
 void setWriteArea(spi_device_handle_t spi, uint16_t ybegin, uint16_t xbegin, 
                                            uint16_t width, uint16_t height);
@@ -69,8 +71,6 @@ void setWriteArea(spi_device_handle_t spi, uint16_t ybegin, uint16_t xbegin,
 void lcd_data(spi_device_handle_t spi, const uint16_t *data, int len);
 
 void  lcd_cmd16(spi_device_handle_t spi, const uint8_t cmd);
-
-void lcd_spi_pre_transfer_callback(spi_transaction_t *t);
 
 uint32_t lcd_get_id(spi_device_handle_t spi);
 

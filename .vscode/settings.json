@@ -13,7 +13,12 @@
         "spi_master.h": "c",
         "stdio.h": "c",
         "chrono": "c",
-        "complex": "c"
+        "complex": "c",
+        "gpio.h": "c",
+        "lcd_ili9486_base.h": "c",
+        "arial_32.h": "c",
+        "arial_24.h": "c",
+        "lcd_ili9486_fontparser.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
     "idf.port": "/dev/ttyUSB0",

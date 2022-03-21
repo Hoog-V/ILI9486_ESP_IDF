@@ -23,10 +23,9 @@ void drawRect(spi_device_handle_t spi, uint16_t xpos, uint16_t ypos, uint16_t wi
 void fillRect(spi_device_handle_t spi, uint16_t xpos, uint16_t ypos, uint16_t width, 
         uint16_t height, uint16_t color)
 {
-    uint16_t* linebuffer = NULL;
+    static uint16_t* linebuffer = NULL;
     esp_err_t ret;
     static spi_transaction_t trans;
-    heap_caps_free(linebuffer);
     linebuffer= heap_caps_malloc(2*width, MALLOC_CAP_DMA);
     setWriteArea(spi, xpos, ypos, width, height);
     for(int i =0; i<width; i++){

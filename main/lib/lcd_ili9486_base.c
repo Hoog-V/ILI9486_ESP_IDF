@@ -8,6 +8,13 @@
 #include "driver/gpio.h"
 #include "lcd_ili9486_base.h"
 
+spi_device_interface_config_t ILI9486_devcfg ={
+    .clock_speed_hz=10*1000*1000,           //Clock out at 10 MHz
+    .mode=0,                                //SPI mode 0
+    .spics_io_num=PIN_NUM_CS,               //CS pin
+    .queue_size=32,                          //We want to be able to queue enough transactions to fill an screen
+    .pre_cb=lcd_spi_pre_transfer_callback,  //Specify pre-transfer callback to handle D/C line
+};
 
 DRAM_ATTR static const lcd_init_cmd_t ili_init_cmds[]=
 {
@@ -288,6 +295,11 @@ bool drawPixel(spi_device_handle_t spi, uint16_t x, uint16_t y, uint16_t color)
     ret |=spi_device_queue_trans(spi, &trans[4], portMAX_DELAY);
     ret |=spi_device_queue_trans(spi, &trans[5], portMAX_DELAY);
     assert(ret==ESP_OK);
+    spi_transaction_t *rtrans;
+    for(int i =0; i<6; i++){
+    ret=spi_device_get_trans_result(spi, &rtrans, portMAX_DELAY);
+    assert(ret==ESP_OK);
+    }
     return true;
 }
 
