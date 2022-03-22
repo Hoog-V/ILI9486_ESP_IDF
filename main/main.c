@@ -52,18 +52,9 @@ void app_main(void)
     spi_device_handle_t spi = setup_spi();
     lcd_init(spi);
     fillRect(spi, 0, 0, 320, 480, 0x0000);
-    //fillRoundRect(spi, 60, 200, 200, 200, 20, 0xFFFF);
-    //fillTriangle(spi, 20,100,100,100,50,20,0xFFFF);
-    //fillCircle(spi, 40, 40, 20, 0xFFFF);
     for(int i =0; i< 10; i++){
-        //
-        //vTaskDelay(10);
         drawChar(spi, 22, 100,i+48, Arial_24);
         vTaskDelay(1000/portTICK_PERIOD_MS);
         fillRect(spi, 22, 100, 24, 24, 0x0000);
     }
-    //render(spi, 22, 100, font8x8_basic['H']);
-    //render(spi, 30, 100, font8x8_basic['o']);
-    //render(spi, 38, 100, font8x8_basic['i']);
-    //render(spi, 38, 100, bitmap_48);
 }

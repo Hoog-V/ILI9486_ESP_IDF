@@ -104,8 +104,6 @@ void lcd_data(spi_device_handle_t spi, const uint16_t *data, int len)
     assert(ret==ESP_OK);            //Should have had no issues.
 }
 
-
-
 /*This function is called (in irq context!) just before a transmission starts. 
  *It will set the D/C line to the value indicated in the user field. 
  */
@@ -241,10 +239,6 @@ void setWriteArea(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin,
     }
 }
 
-
-
-
-
 bool drawPixel(spi_device_handle_t spi, uint16_t x, uint16_t y, uint16_t color) 
 {
     if (x >= 320|| y >= 480) {
@@ -286,20 +280,14 @@ bool drawPixel(spi_device_handle_t spi, uint16_t x, uint16_t y, uint16_t color)
     trans[5].length=16;
     trans[5].flags = SPI_TRANS_USE_TXDATA;
     trans[5].user = (void *)1;
-    ret=spi_device_queue_trans(spi, &trans[0], portMAX_DELAY);
-    ret |=spi_device_queue_trans(spi, &trans[1], portMAX_DELAY);
-    ret |=spi_device_queue_trans(spi, &trans[1], portMAX_DELAY);
-    ret |=spi_device_queue_trans(spi, &trans[2], portMAX_DELAY);
-    ret |=spi_device_queue_trans(spi, &trans[3], portMAX_DELAY);
-    ret |=spi_device_queue_trans(spi, &trans[3], portMAX_DELAY);
-    ret |=spi_device_queue_trans(spi, &trans[4], portMAX_DELAY);
-    ret |=spi_device_queue_trans(spi, &trans[5], portMAX_DELAY);
-    assert(ret==ESP_OK);
-    spi_transaction_t *rtrans;
-    for(int i =0; i<6; i++){
-    ret=spi_device_get_trans_result(spi, &rtrans, portMAX_DELAY);
-    assert(ret==ESP_OK);
-    }
+    ret=spi_device_polling_transmit(spi, &trans[0]);
+    ret |=spi_device_polling_transmit(spi, &trans[1]);
+    ret |=spi_device_polling_transmit(spi, &trans[1]);
+    ret |=spi_device_polling_transmit(spi, &trans[2]);
+    ret |=spi_device_polling_transmit(spi, &trans[3]);
+    ret |=spi_device_polling_transmit(spi, &trans[3]);
+    ret |=spi_device_polling_transmit(spi, &trans[4]);
+    ret |=spi_device_polling_transmit(spi, &trans[5]);
     return true;
 }
 
