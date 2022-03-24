@@ -20,7 +20,7 @@
 
 // Constant: font8x8_basic
 // Contains an 8x8 font map for unicode points U+0000 - U+007F (basic latin)
-char font8x8_basic[128][8] DRAM_ATTR = {
+const char Basic8_font[128][8] DRAM_ATTR = {
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0000 (nul)
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0001
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0002
@@ -150,3 +150,56 @@ char font8x8_basic[128][8] DRAM_ATTR = {
     { 0x6E, 0x3B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+007E (~)
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}    // U+007F
 };
+
+#define Basic8_height 8
+#define Basic8_Ybits  8
+
+#define Basic8_LSNorm 1
+#define Basic8_LSBig 2
+#define Basic8_LSLarge 3
+
+const char Basic8_width = 8;
+
+const char* Basic8_char_addr[]={&Basic8_font[0],&Basic8_font[1],&Basic8_font[2],
+                                &Basic8_font[3],&Basic8_font[4],&Basic8_font[5],
+                                &Basic8_font[6],&Basic8_font[7],&Basic8_font[8],
+                                &Basic8_font[9],&Basic8_font[10],&Basic8_font[11],
+                                &Basic8_font[12],&Basic8_font[13],&Basic8_font[14],
+                                &Basic8_font[15],&Basic8_font[16],&Basic8_font[17],
+                                &Basic8_font[18],&Basic8_font[19],&Basic8_font[20],
+                                &Basic8_font[21],&Basic8_font[22],&Basic8_font[23],
+                                &Basic8_font[24],&Basic8_font[25],&Basic8_font[26],
+                                &Basic8_font[27],&Basic8_font[28],&Basic8_font[29],
+                                &Basic8_font[30],&Basic8_font[31],&Basic8_font[32],
+                                &Basic8_font[33],&Basic8_font[34],&Basic8_font[35],
+                                &Basic8_font[36],&Basic8_font[37],&Basic8_font[38],
+                                &Basic8_font[39],&Basic8_font[40],&Basic8_font[41],
+                                &Basic8_font[42],&Basic8_font[43],&Basic8_font[44],
+                                &Basic8_font[45],&Basic8_font[46],&Basic8_font[47],
+                                &Basic8_font[48],&Basic8_font[49],&Basic8_font[50],
+                                &Basic8_font[51],&Basic8_font[52],&Basic8_font[53],
+                                &Basic8_font[54],&Basic8_font[55],&Basic8_font[56],
+                                &Basic8_font[57],&Basic8_font[58],&Basic8_font[59],
+                                &Basic8_font[60],&Basic8_font[61],&Basic8_font[62],
+                                &Basic8_font[63],&Basic8_font[64],&Basic8_font[65],
+                                &Basic8_font[66],&Basic8_font[67],&Basic8_font[68],
+                                &Basic8_font[69],&Basic8_font[70],&Basic8_font[71],
+                                &Basic8_font[72],&Basic8_font[73],&Basic8_font[74],
+                                &Basic8_font[75],&Basic8_font[76],&Basic8_font[77],
+                                &Basic8_font[78],&Basic8_font[79],&Basic8_font[80],
+                                &Basic8_font[81],&Basic8_font[82],&Basic8_font[83],
+                                &Basic8_font[84],&Basic8_font[85],&Basic8_font[86],
+                                &Basic8_font[87],&Basic8_font[88],&Basic8_font[89],
+                                &Basic8_font[90],&Basic8_font[91],&Basic8_font[92],
+                                &Basic8_font[93],&Basic8_font[94],&Basic8_font[95],
+                                &Basic8_font[96],&Basic8_font[97],&Basic8_font[98],
+                                &Basic8_font[99],&Basic8_font[100],&Basic8_font[101],
+                                &Basic8_font[102],&Basic8_font[103],&Basic8_font[104],
+                                &Basic8_font[105],&Basic8_font[106],&Basic8_font[107],
+                                &Basic8_font[108],&Basic8_font[109],&Basic8_font[110],
+                                &Basic8_font[111],&Basic8_font[112],&Basic8_font[113],
+                                &Basic8_font[114],&Basic8_font[115],&Basic8_font[116],
+                                &Basic8_font[117],&Basic8_font[118],&Basic8_font[119],
+                                &Basic8_font[120],&Basic8_font[121],&Basic8_font[122],
+                                &Basic8_font[123],&Basic8_font[124],&Basic8_font[125],
+                                &Basic8_font[126],&Basic8_font[127]};

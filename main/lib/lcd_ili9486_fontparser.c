@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_system.h"
@@ -13,24 +14,41 @@
 
 
 
-void drawChar(spi_device_handle_t spi, uint16_t xstart, uint16_t ystart, char character, 
-        struct lcdfont font) 
+
+void drawChar(spi_device_handle_t spi, uint16_t xstart, uint16_t ystart, 
+        unsigned char character, struct lcdfont font) 
 {
     int x,y;
     int set;
-    const char *bitmap = font.char_addr[character-ascii_zero];
-    uint8_t character_width = font.width[character-ascii_zero];
+    uint8_t character_width;
+    
+    
     uint8_t a_of_bytes = font.font_size/font.line_size;
+    const char *bitmap = font.addr[character];
+    bool flipped = font.font_flipped;
+    if(font.variable_width){
+        character_width = font.width[character-ascii_zero];
+    }
+    else{
+        character_width = *font.width;
+    }
+
     for (x=0; x < character_width; x++) {
-    for(int p=0; p< a_of_bytes; p++){
-     for (y=0; y < font.line_size; y++) {
-        set = bitmap[x+(p*character_width)] & 1 << y;
-        if(set){
-            drawPixel(spi, xstart+x, ystart+y+(p*8), 0xFFFF);
-        }
+        for(int p=0; p< a_of_bytes; p++){
+             for (y=0; y < font.line_size; y++) {
+                 set = bitmap[x+(p*character_width)] & 1 << y;
+                 if(set && flipped){
+                     drawPixel(spi, xstart+y, ystart+x+(p*8), 0xFFFF);
+                 }
+                 else if (set && !flipped)
+                 {
+                    drawPixel(spi, xstart+x, ystart+y+(p*8), 0xFFFF);
+                 }
+              }
         }
     }
-    }
+    
+
 }
 
 void drawText(spi_device_handle_t spi, uint16_t xstart, uint16_t ystart, const char *string,
@@ -39,7 +57,12 @@ void drawText(spi_device_handle_t spi, uint16_t xstart, uint16_t ystart, const c
     uint16_t x = xstart;
     while(*string){
         drawChar(spi, x, ystart, *string, font);
-        x += font.width[ asciitonum(*string) ] + letter_spacing;
+        if(font.variable_width){
+        x += font.width[(unsigned char)*string] + font.letter_spacing;
+        }
+        else{
+            x+=*font.width + font.letter_spacing;
+        }
         string++;
     }
 }

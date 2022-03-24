@@ -13,7 +13,7 @@
 #include "lib/lcd_ili9486_colors.h"
 #include "lib/lcd_ili9486_fontparser.h"
 #include "lib/lcdfont.h"
-//#include "font8x8_basic.h"
+#include "Fonts/basic_8.h"
 //#include "Arial_32.h"
 //#include "Arial_64.h"
 //#include "Arial_8.h"
@@ -24,8 +24,18 @@
 struct lcdfont Arial_24 = {Arial24_char_addr, 
                            Arial24_char_width, 
                            Arial24_height, 
-                           Arial24_Ybits};
+                           Arial24_Ybits,
+                           Arial24_LSNorm,
+                           VARIABLE_WIDTH,
+                           NORMAL};
 
+struct lcdfont Basic_8 = {Basic8_char_addr,
+                          &Basic8_width,
+                          Basic8_height,
+                          Basic8_Ybits,
+                          Basic8_LSNorm,
+                          CONSTANT_WIDTH,
+                          FLIPPED};
 
 spi_device_handle_t setup_spi(){
     esp_err_t ret;
@@ -52,8 +62,9 @@ void app_main(void)
     spi_device_handle_t spi = setup_spi();
     lcd_init(spi);
     fillRect(spi, 0, 0, 320, 480, 0x0000);
-    char test[] = "1234";
-    drawText(spi, 22, 100, test, Arial_24);
+    const char test[] = "Test 123";
+    drawText(spi, 22, 100, test, Basic_8);
+    //drawChar(spi, 22, 100, numtoascii(0), Basic_8);
     printf("This the orig string: %s \r\n",test);
     while(1){
     vTaskDelay(1000/portTICK_PERIOD_MS);
