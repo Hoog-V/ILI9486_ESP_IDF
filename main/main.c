@@ -19,24 +19,6 @@
 //#include "Arial_8.h"
 #include "Fonts/Arial_24.h"
 
-
-
-struct lcdfont Arial_24 = {Arial24_char_addr, 
-                           Arial24_char_width, 
-                           Arial24_height, 
-                           Arial24_Ybits,
-                           Arial24_LSNorm,
-                           VARIABLE_WIDTH,
-                           NORMAL};
-
-struct lcdfont Basic_8 = {Basic8_char_addr,
-                          &Basic8_width,
-                          Basic8_height,
-                          Basic8_Ybits,
-                          Basic8_LSNorm,
-                          CONSTANT_WIDTH,
-                          FLIPPED};
-
 spi_device_handle_t setup_spi(){
     esp_err_t ret;
     spi_device_handle_t spi;
@@ -61,17 +43,11 @@ void app_main(void)
 {
     spi_device_handle_t spi = setup_spi();
     lcd_init(spi);
-    fillRect(spi, 0, 0, 320, 480, 0x0000);
+    fillRect(spi, 0, 0, 320, 480, BLACK);
     const char test[] = "I love you";
-    drawText(spi, 22, 100, test, color565(255,0,0), Arial_24);
-    //drawChar(spi, 22, 100, 48, Basic_8);
+    drawText(spi, 22, 100, test, color565(255,0,0), Basic_8);
     printf("This the orig string: %s \r\n",test);
     while(1){
-    vTaskDelay(1000/portTICK_PERIOD_MS);
-    // for(int i =0; i< 10; i++){
-    //     drawChar(spi, 22, 100, numtoascii(i), Arial_24);
-    //     vTaskDelay(1000/portTICK_PERIOD_MS);
-    //     fillRect(spi, 22, 100, 24, 24, 0x0000);
-    //
+        vTaskDelay(1000/portTICK_PERIOD_MS);
     }
 }

@@ -386,3 +386,10 @@ const uint8_t Arial24_Ybits = 8;
 #define Arial24_LSBig 4
 #define Arial24_LSLarge 5
 
+struct lcdfont Arial_24 = {Arial24_char_addr, 
+                           Arial24_char_width, 
+                           Arial24_height, 
+                           Arial24_Ybits,
+                           Arial24_LSNorm,
+                           VARIABLE_WIDTH,
+                           NORMAL};

@@ -191,3 +191,12 @@ const char* Basic8_char_addr[]={(const char *)&Basic8_font[0],(const char *)&Bas
                                 (const char *)&Basic8_font[122],(const char *)&Basic8_font[123],
                                 (const char *)&Basic8_font[124],(const char *)&Basic8_font[125],
                                 (const char *)&Basic8_font[126]};
+
+
+struct lcdfont Basic_8 = {Basic8_char_addr,
+                          &Basic8_width,
+                          Basic8_height,
+                          Basic8_Ybits,
+                          Basic8_LSNorm,
+                          CONSTANT_WIDTH,
+                          FLIPPED};
