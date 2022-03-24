@@ -18,7 +18,8 @@
         "lcd_ili9486_base.h": "c",
         "arial_32.h": "c",
         "arial_24.h": "c",
-        "lcd_ili9486_fontparser.h": "c"
+        "lcd_ili9486_fontparser.h": "c",
+        "lcdfont.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
     "idf.port": "/dev/ttyUSB0",

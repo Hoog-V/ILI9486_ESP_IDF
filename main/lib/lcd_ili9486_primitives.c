@@ -172,7 +172,7 @@ void drawCircle(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin,
 }
 }
 
-void fillCircleHelper(spi_device_handle_t spi, int16_t x0, int16_t y0, int16_t r, 
+static void fillCircleHelper(spi_device_handle_t spi, int16_t x0, int16_t y0, int16_t r, 
         uint8_t corners, int16_t delta, uint16_t color) 
 {
 
@@ -222,7 +222,7 @@ void fillCircle(spi_device_handle_t spi, uint16_t xbegin, uint16_t ybegin,
 }
 
 
-void drawCircleHelper(spi_device_handle_t spi, int16_t x0, int16_t y0, int16_t r,
+static void drawCircleHelper(spi_device_handle_t spi, int16_t x0, int16_t y0, int16_t r,
          uint8_t cornername, uint16_t color) 
 {
   int16_t f = 1 - r;

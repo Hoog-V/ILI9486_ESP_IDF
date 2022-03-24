@@ -9,7 +9,7 @@
 #include "lcd_ili9486_base.h"
 
 spi_device_interface_config_t ILI9486_devcfg ={
-    .clock_speed_hz=10*1000*1000,           //Clock out at 10 MHz
+    .clock_speed_hz=32*1000*1000,           //Clock out at 10 MHz
     .mode=0,                                //SPI mode 0
     .spics_io_num=PIN_NUM_CS,               //CS pin
     .queue_size=32,                          //We want to be able to queue enough transactions to fill an screen

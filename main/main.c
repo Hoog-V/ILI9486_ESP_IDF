@@ -21,6 +21,11 @@
 
 
 
+struct lcdfont Arial_24 = {Arial24_char_addr, 
+                           Arial24_char_width, 
+                           Arial24_height, 
+                           Arial24_Ybits};
+
 
 spi_device_handle_t setup_spi(){
     esp_err_t ret;
@@ -44,17 +49,18 @@ spi_device_handle_t setup_spi(){
 
 void app_main(void)
 {
-    struct lcdfont Arial_24;
-    Arial_24.char_addr = Arial24_char_addr;
-    Arial_24.width = Arial24_char_width;
-    Arial_24.font_size = 24;
-    Arial_24.line_size= 8;
     spi_device_handle_t spi = setup_spi();
     lcd_init(spi);
     fillRect(spi, 0, 0, 320, 480, 0x0000);
-    for(int i =0; i< 10; i++){
-        drawChar(spi, 22, 100,i+48, Arial_24);
-        vTaskDelay(1000/portTICK_PERIOD_MS);
-        fillRect(spi, 22, 100, 24, 24, 0x0000);
+    char test[] = "1234";
+    drawText(spi, 22, 100, test, Arial_24);
+    printf("This the orig string: %s \r\n",test);
+    while(1){
+    vTaskDelay(1000/portTICK_PERIOD_MS);
+    // for(int i =0; i< 10; i++){
+    //     drawChar(spi, 22, 100, numtoascii(i), Arial_24);
+    //     vTaskDelay(1000/portTICK_PERIOD_MS);
+    //     fillRect(spi, 22, 100, 24, 24, 0x0000);
+    //
     }
 }
