@@ -20,39 +20,7 @@
 
 // Constant: font8x8_basic
 // Contains an 8x8 font map for unicode points U+0000 - U+007F (basic latin)
-const char Basic8_font[128][8] DRAM_ATTR = {
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0000 (nul)
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0001
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0002
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0003
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0004
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0005
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0006
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0007
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0008
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0009
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+000A
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+000B
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+000C
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+000D
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+000E
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+000F
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0010
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0011
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0012
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0013
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0014
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0015
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0016
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0017
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0018
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0019
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+001A
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+001B
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+001C
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+001D
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+001E
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+001F
+const char Basic8_font[127][8] DRAM_ATTR = {
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0020 (space)
     { 0x18, 0x3C, 0x3C, 0x18, 0x18, 0x00, 0x18, 0x00},   // U+0021 (!)
     { 0x36, 0x36, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0022 (")
@@ -148,7 +116,6 @@ const char Basic8_font[128][8] DRAM_ATTR = {
     { 0x18, 0x18, 0x18, 0x00, 0x18, 0x18, 0x18, 0x00},   // U+007C (|)
     { 0x07, 0x0C, 0x0C, 0x38, 0x0C, 0x0C, 0x07, 0x00},   // U+007D (})
     { 0x6E, 0x3B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+007E (~)
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}    // U+007F
 };
 
 #define Basic8_height 8
@@ -160,46 +127,67 @@ const char Basic8_font[128][8] DRAM_ATTR = {
 
 const char Basic8_width = 8;
 
-const char* Basic8_char_addr[]={&Basic8_font[0],&Basic8_font[1],&Basic8_font[2],
-                                &Basic8_font[3],&Basic8_font[4],&Basic8_font[5],
-                                &Basic8_font[6],&Basic8_font[7],&Basic8_font[8],
-                                &Basic8_font[9],&Basic8_font[10],&Basic8_font[11],
-                                &Basic8_font[12],&Basic8_font[13],&Basic8_font[14],
-                                &Basic8_font[15],&Basic8_font[16],&Basic8_font[17],
-                                &Basic8_font[18],&Basic8_font[19],&Basic8_font[20],
-                                &Basic8_font[21],&Basic8_font[22],&Basic8_font[23],
-                                &Basic8_font[24],&Basic8_font[25],&Basic8_font[26],
-                                &Basic8_font[27],&Basic8_font[28],&Basic8_font[29],
-                                &Basic8_font[30],&Basic8_font[31],&Basic8_font[32],
-                                &Basic8_font[33],&Basic8_font[34],&Basic8_font[35],
-                                &Basic8_font[36],&Basic8_font[37],&Basic8_font[38],
-                                &Basic8_font[39],&Basic8_font[40],&Basic8_font[41],
-                                &Basic8_font[42],&Basic8_font[43],&Basic8_font[44],
-                                &Basic8_font[45],&Basic8_font[46],&Basic8_font[47],
-                                &Basic8_font[48],&Basic8_font[49],&Basic8_font[50],
-                                &Basic8_font[51],&Basic8_font[52],&Basic8_font[53],
-                                &Basic8_font[54],&Basic8_font[55],&Basic8_font[56],
-                                &Basic8_font[57],&Basic8_font[58],&Basic8_font[59],
-                                &Basic8_font[60],&Basic8_font[61],&Basic8_font[62],
-                                &Basic8_font[63],&Basic8_font[64],&Basic8_font[65],
-                                &Basic8_font[66],&Basic8_font[67],&Basic8_font[68],
-                                &Basic8_font[69],&Basic8_font[70],&Basic8_font[71],
-                                &Basic8_font[72],&Basic8_font[73],&Basic8_font[74],
-                                &Basic8_font[75],&Basic8_font[76],&Basic8_font[77],
-                                &Basic8_font[78],&Basic8_font[79],&Basic8_font[80],
-                                &Basic8_font[81],&Basic8_font[82],&Basic8_font[83],
-                                &Basic8_font[84],&Basic8_font[85],&Basic8_font[86],
-                                &Basic8_font[87],&Basic8_font[88],&Basic8_font[89],
-                                &Basic8_font[90],&Basic8_font[91],&Basic8_font[92],
-                                &Basic8_font[93],&Basic8_font[94],&Basic8_font[95],
-                                &Basic8_font[96],&Basic8_font[97],&Basic8_font[98],
-                                &Basic8_font[99],&Basic8_font[100],&Basic8_font[101],
-                                &Basic8_font[102],&Basic8_font[103],&Basic8_font[104],
-                                &Basic8_font[105],&Basic8_font[106],&Basic8_font[107],
-                                &Basic8_font[108],&Basic8_font[109],&Basic8_font[110],
-                                &Basic8_font[111],&Basic8_font[112],&Basic8_font[113],
-                                &Basic8_font[114],&Basic8_font[115],&Basic8_font[116],
-                                &Basic8_font[117],&Basic8_font[118],&Basic8_font[119],
-                                &Basic8_font[120],&Basic8_font[121],&Basic8_font[122],
-                                &Basic8_font[123],&Basic8_font[124],&Basic8_font[125],
-                                &Basic8_font[126],&Basic8_font[127]};
+const char* Basic8_char_addr[]={(const char *)&Basic8_font[0],(const char *)&Basic8_font[1],
+                                (const char *)&Basic8_font[2],(const char *)&Basic8_font[3],
+                                (const char *)&Basic8_font[4],(const char *)&Basic8_font[5],
+                                (const char *)&Basic8_font[6],(const char *)&Basic8_font[7],
+                                (const char *)&Basic8_font[8],(const char *)&Basic8_font[9],
+                                (const char *)&Basic8_font[10],(const char *)&Basic8_font[11],
+                                (const char *)&Basic8_font[12],(const char *)&Basic8_font[13],
+                                (const char *)&Basic8_font[14],(const char *)&Basic8_font[15],
+                                (const char *)&Basic8_font[16],(const char *)&Basic8_font[17],
+                                (const char *)&Basic8_font[18],(const char *)&Basic8_font[19],
+                                (const char *)&Basic8_font[20],(const char *)&Basic8_font[21],
+                                (const char *)&Basic8_font[22],(const char *)&Basic8_font[23],
+                                (const char *)&Basic8_font[24],(const char *)&Basic8_font[25],
+                                (const char *)&Basic8_font[26],(const char *)&Basic8_font[27],
+                                (const char *)&Basic8_font[28],(const char *)&Basic8_font[29],
+                                (const char *)&Basic8_font[30],(const char *)&Basic8_font[31],
+                                (const char *)&Basic8_font[32],(const char *)&Basic8_font[33],
+                                (const char *)&Basic8_font[34],(const char *)&Basic8_font[35],
+                                (const char *)&Basic8_font[36],(const char *)&Basic8_font[37],
+                                (const char *)&Basic8_font[38],(const char *)&Basic8_font[39],
+                                (const char *)&Basic8_font[40],(const char *)&Basic8_font[41],
+                                (const char *)&Basic8_font[42],(const char *)&Basic8_font[43],
+                                (const char *)&Basic8_font[44],(const char *)&Basic8_font[45],
+                                (const char *)&Basic8_font[46],(const char *)&Basic8_font[47],
+                                (const char *)&Basic8_font[48],(const char *)&Basic8_font[49],
+                                (const char *)&Basic8_font[50],(const char *)&Basic8_font[51],
+                                (const char *)&Basic8_font[52],(const char *)&Basic8_font[53],
+                                (const char *)&Basic8_font[54],(const char *)&Basic8_font[55],
+                                (const char *)&Basic8_font[56],(const char *)&Basic8_font[57],
+                                (const char *)&Basic8_font[58],(const char *)&Basic8_font[59],
+                                (const char *)&Basic8_font[60],(const char *)&Basic8_font[61],
+                                (const char *)&Basic8_font[62],(const char *)&Basic8_font[63],
+                                (const char *)&Basic8_font[64],(const char *)&Basic8_font[65],
+                                (const char *)&Basic8_font[66],(const char *)&Basic8_font[67],
+                                (const char *)&Basic8_font[68],(const char *)&Basic8_font[69],
+                                (const char *)&Basic8_font[70],(const char *)&Basic8_font[71],
+                                (const char *)&Basic8_font[72],(const char *)&Basic8_font[73],
+                                (const char *)&Basic8_font[74],(const char *)&Basic8_font[75],
+                                (const char *)&Basic8_font[76],(const char *)&Basic8_font[77],
+                                (const char *)&Basic8_font[78],(const char *)&Basic8_font[79],
+                                (const char *)&Basic8_font[80],(const char *)&Basic8_font[81],
+                                (const char *)&Basic8_font[82],(const char *)&Basic8_font[83],
+                                (const char *)&Basic8_font[84],(const char *)&Basic8_font[85],
+                                (const char *)&Basic8_font[86],(const char *)&Basic8_font[87],
+                                (const char *)&Basic8_font[88],(const char *)&Basic8_font[89],
+                                (const char *)&Basic8_font[90],(const char *)&Basic8_font[91],
+                                (const char *)&Basic8_font[92],(const char *)&Basic8_font[93],
+                                (const char *)&Basic8_font[94],(const char *)&Basic8_font[95],
+                                (const char *)&Basic8_font[96],(const char *)&Basic8_font[97],
+                                (const char *)&Basic8_font[98],(const char *)&Basic8_font[99],
+                                (const char *)&Basic8_font[100],(const char *)&Basic8_font[101],
+                                (const char *)&Basic8_font[102],(const char *)&Basic8_font[103],
+                                (const char *)&Basic8_font[104],(const char *)&Basic8_font[105],
+                                (const char *)&Basic8_font[106],(const char *)&Basic8_font[107],
+                                (const char *)&Basic8_font[108],(const char *)&Basic8_font[109],
+                                (const char *)&Basic8_font[110],(const char *)&Basic8_font[111],
+                                (const char *)&Basic8_font[112],(const char *)&Basic8_font[113],
+                                (const char *)&Basic8_font[114],(const char *)&Basic8_font[115],
+                                (const char *)&Basic8_font[116],(const char *)&Basic8_font[117],
+                                (const char *)&Basic8_font[118],(const char *)&Basic8_font[119],
+                                (const char *)&Basic8_font[120],(const char *)&Basic8_font[121],
+                                (const char *)&Basic8_font[122],(const char *)&Basic8_font[123],
+                                (const char *)&Basic8_font[124],(const char *)&Basic8_font[125],
+                                (const char *)&Basic8_font[126]};

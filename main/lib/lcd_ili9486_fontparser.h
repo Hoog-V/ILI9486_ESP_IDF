@@ -13,7 +13,7 @@ inline uint8_t asciitonum(uint8_t number){
 
 
 void drawChar(spi_device_handle_t spi, uint16_t xstart, uint16_t ystart,  
-        unsigned char character, struct lcdfont font);
+        unsigned char character, uint16_t color, struct lcdfont font);
 
 void drawText(spi_device_handle_t spi, uint16_t xstart, uint16_t ystart, 
-        const char *string, struct lcdfont font);
+        const char *string, uint16_t color, struct lcdfont font);

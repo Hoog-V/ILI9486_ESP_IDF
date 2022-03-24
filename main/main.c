@@ -62,9 +62,9 @@ void app_main(void)
     spi_device_handle_t spi = setup_spi();
     lcd_init(spi);
     fillRect(spi, 0, 0, 320, 480, 0x0000);
-    const char test[] = "Test 123";
-    drawText(spi, 22, 100, test, Basic_8);
-    //drawChar(spi, 22, 100, numtoascii(0), Basic_8);
+    const char test[] = "I love you";
+    drawText(spi, 22, 100, test, color565(255,0,0), Arial_24);
+    //drawChar(spi, 22, 100, 48, Basic_8);
     printf("This the orig string: %s \r\n",test);
     while(1){
     vTaskDelay(1000/portTICK_PERIOD_MS);
