@@ -59,19 +59,24 @@ void drawText(spi_device_handle_t spi, uint16_t xstart, uint16_t ystart, const c
 {
     uint16_t x = xstart;
     while(*string){
-        if(*string != ' '){
-        drawChar(spi, x, ystart,*string, color, font);
+        if(*string == 'g'){
+            drawChar(spi, x, ystart+5, *string, color, font);
         }
+        else if(*string != ' '){
+            drawChar(spi, x, ystart,*string, color, font);
+        }
+        
         else{
-            printf("Found space with width: %d on index %d\r\n", font.width[getarrOffset((unsigned char) *string)], getarrOffset((unsigned char)*string)-32);
+            printf("Found space with width: %d on index %d\r\n", font.width[getarrOffset((unsigned char) *string)], getarrOffset((unsigned char)*string));
         }
 
         if(font.variable_width){
-        x += font.width[getarrOffset((unsigned char)*string)] + font.letter_spacing;
+            x += font.width[getarrOffset((unsigned char)*string)] + font.letter_spacing;
         }
         else{
-            x+=*font.width + font.letter_spacing;
+            x+= *font.width + font.letter_spacing;
         }
+
         string++;
     }
 }

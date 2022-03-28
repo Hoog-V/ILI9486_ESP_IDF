@@ -14,7 +14,8 @@
 #include "lib/lcd_ili9486_fontparser.h"
 #include "lib/lcdfont.h"
 #include "Fonts/basic_8.h"
-//#include "Arial_32.h"
+#include "Fonts/Arial_32.h"
+#include "Fonts/Cantarell Regular_32.h"
 //#include "Arial_64.h"
 //#include "Arial_8.h"
 #include "Fonts/Arial_24.h"
@@ -45,8 +46,8 @@ void app_main(void)
     spi_device_handle_t spi = setup_spi();
     lcd_init(spi);
     fillRect(spi, 0, 0, 320, 480, BLACK);
-    const char test[] = "Hoi pap!";
-    drawText(spi, 22, 100, test, color565(0,255,0), Dejavu_32);
+    const char test[] = "abcdefghijklmnop";
+    drawText(spi, 22, 100, test, color565(0,255,0), Cantarell_32);
     printf("This the orig string: %s \r\n",test);
     while(1){
         vTaskDelay(1000/portTICK_PERIOD_MS);
