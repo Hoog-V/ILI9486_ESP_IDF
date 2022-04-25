@@ -121,7 +121,7 @@ const char Basic8_font[127][8] DRAM_ATTR = {
 #define Basic8_height 8
 #define Basic8_Ybits  8
 
-#define Basic8_LSNorm 1
+#define Basic8_LSNorm 0
 #define Basic8_LSBig 2
 #define Basic8_LSLarge 3
 
