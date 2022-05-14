@@ -5,6 +5,8 @@
 
 This is a library made to control the 3.5 Inch RPI ILI9486 display.
 Some functions are self-written and some are ported over from the Adafruit GFX library.
+It was meant as a way to learn the esp-idf framework and ILI9486 display controller.
+It was never meant to be used for anything practical really.
 
 
 ## Build and Flash
@@ -16,9 +18,7 @@ Run `idf.py -p PORT flash monitor` to build, flash and monitor the project.
 See the [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/latest/get-started/index.html) for full steps to configure and use ESP-IDF to build projects.
 
 
-## Future plans
 
-- In the future I want to replace the copied code from Adafruit GFX lib with my own
-platform optimized functions. 
 
-- Create a c++ version of this lib
+I abondoned this project, now I know enough to be able use the esp-idf framework and have basic understanding of display drivers.
+Goals where accomplished. Used this only for learning purposes.
