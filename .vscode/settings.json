@@ -20,7 +20,8 @@
         "arial_24.h": "c",
         "lcd_ili9486_fontparser.h": "c",
         "lcdfont.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "cantarell regular_32.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
     "idf.port": "/dev/ttyUSB0",
